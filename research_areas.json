@@ -1,0 +1,210 @@
+{
+    "Artificial Intelligence (AI)": [
+        "Machine Learning",
+        "Deep Learning",
+        "Natural Language Processing",
+        "Computer Vision",
+        "Generative AI",
+        "Reinforcement Learning",
+        "AI Ethics",
+        "Explainable AI (XAI)",
+        "Multi-Agent Systems",
+        "AI in Healthcare"
+    ],
+    "Data Science and Big Data": [
+        "Data Mining",
+        "Statistical Modeling",
+        "Data Analytics",
+        "Database Systems",
+        "Big Data Engineering",
+        "Data Visualization",
+        "Predictive Analytics",
+        "Time Series Analysis",
+        "Data Wrangling",
+        "Real-Time Analytics"
+    ],
+    "Algorithms and Theoretical Computer Science": [
+        "Computational Complexity",
+        "Cryptography",
+        "Quantum Computing",
+        "Approximation Algorithms",
+        "Graph Algorithms",
+        "Randomized Algorithms",
+        "Game Theory",
+        "Distributed Algorithms"
+    ],
+    "Computer Systems and Networks": [
+        "Operating Systems",
+        "Distributed Systems",
+        "Cloud Computing",
+        "Edge Computing",
+        "Internet of Things (IoT)",
+        "High-Performance Networking",
+        "Containerization",
+        "Serverless Computing",
+        "5G Networks",
+        "Network Virtualization"
+    ],
+    "Software Engineering": [
+        "Software Development Life Cycle (SDLC)",
+        "DevOps",
+        "Program Verification",
+        "Microservices Architecture",
+        "Agile Methodologies",
+        "Test-Driven Development (TDD)",
+        "Code Refactoring",
+        "Software Design Patterns"
+    ],
+    "Human-Computer Interaction (HCI)": [
+        "Usability Engineering",
+        "Virtual and Augmented Reality",
+        "Accessible Design",
+        "Conversational Interfaces",
+        "Emotion Recognition",
+        "User-Centered Design",
+        "Haptics",
+        "Eye-Tracking Interfaces"
+    ],
+    "Cybersecurity and Privacy": [
+        "Network Security",
+        "Privacy Preservation",
+        "Ethical Hacking",
+        "Zero Trust Architectures",
+        "Cryptographic Protocols",
+        "Security for IoT",
+        "Incident Response",
+        "Secure Software Development",
+        "Digital Forensics",
+        "Blockchain Security"
+    ],
+    "Computational Biology and Bioinformatics": [
+        "Genomics Analysis",
+        "Protein Folding",
+        "Drug Discovery",
+        "Systems Biology",
+        "Bioinformatics Algorithms",
+        "Phylogenetics",
+        "Epigenomics",
+        "Metabolomics"
+    ],
+    "Graphics and Visualization": [
+        "3D Modeling",
+        "Visualization Tools",
+        "Rendering Algorithms",
+        "AR/VR Graphics",
+        "Procedural Generation",
+        "Scientific Visualization",
+        "Animation Techniques",
+        "Geospatial Visualization"
+    ],
+    "Robotics": [
+        "Autonomous Systems",
+        "Control Systems",
+        "Robotic Perception",
+        "Human-Robot Interaction",
+        "Swarm Robotics",
+        "Soft Robotics",
+        "Robotics for Healthcare",
+        "Tactile Sensing"
+    ],
+    "Embedded Systems and Hardware": [
+        "Computer Architecture",
+        "FPGA and ASIC Design",
+        "Real-Time Systems",
+        "Hardware-Software Co-Design",
+        "Embedded AI",
+        "Wearable Devices",
+        "Energy-Efficient Hardware",
+        "IoT Hardware Design"
+    ],
+    "Parallel and High-Performance Computing": [
+        "Supercomputing",
+        "GPU Programming",
+        "Parallel Algorithms",
+        "Distributed Memory Systems",
+        "Cluster Computing",
+        "Memory Optimization Techniques",
+        "High-Throughput Computing",
+        "Quantum Parallelism"
+    ],
+    "Natural Computing": [
+        "Evolutionary Computation",
+        "Neural Networks",
+        "Swarm Intelligence",
+        "Bio-Inspired Algorithms",
+        "Artificial Life",
+        "Self-Organizing Systems",
+        "Membrane Computing",
+        "Molecular Computing"
+    ],
+    "Programming Languages": [
+        "Compiler Design",
+        "Type Theory",
+        "Language Semantics",
+        "Functional Programming",
+        "Domain-Specific Languages",
+        "Just-In-Time Compilation",
+        "Static Code Analysis",
+        "Programming Paradigms"
+    ],
+    "Information Retrieval": [
+        "Search Engines",
+        "Recommender Systems",
+        "Information Extraction",
+        "Knowledge Graphs",
+        "Text Retrieval",
+        "Multimedia Retrieval",
+        "Semantic Search",
+        "Sentiment Analysis"
+    ],
+    "Social Computing": [
+        "Online Communities",
+        "Digital Humanities",
+        "Social Network Analysis",
+        "Crowdsourcing",
+        "Social Simulation",
+        "Civic Technology",
+        "Computational Social Science",
+        "Social Media Analytics"
+    ],
+    "Formal Methods": [
+        "Model Checking",
+        "Verification Tools",
+        "Formal Specification",
+        "Automated Reasoning",
+        "Theorem Proving",
+        "Symbolic Execution",
+        "Runtime Verification",
+        "Temporal Logic"
+    ],
+    "Education Technology (EdTech)": [
+        "E-Learning Systems",
+        "Gamification",
+        "Adaptive Learning",
+        "Intelligent Tutoring Systems",
+        "MOOCs",
+        "Virtual Classrooms",
+        "Learning Analytics",
+        "Collaborative Learning Tools"
+    ],
+    "Knowledge Representation and Reasoning": [
+        "Ontologies",
+        "Logic Programming",
+        "Knowledge Graphs",
+        "Reasoning under Uncertainty",
+        "Rule-Based Systems",
+        "Causal Inference",
+        "Commonsense Reasoning",
+        "Temporal Reasoning"
+    ],
+    "Digital Signal and Image Processing": [
+        "Audio Processing",
+        "Image Enhancement",
+        "Signal Reconstruction",
+        "Medical Image Analysis",
+        "Speech Signal Processing",
+        "Video Compression",
+        "Remote Sensing",
+        "Image Segmentation"
+    ]
+}
