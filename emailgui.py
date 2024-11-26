@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QComboBox, QFileDialog, QMessageBox,
                             QCompleter, QHeaderView)
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtGui import QKeySequence
+
 
 import smtplib
 from email.mime.text import MIMEText
@@ -15,7 +18,15 @@ from email.mime.application import MIMEApplication
 from datetime import datetime
 import os
 from email.utils import formatdate
+
+from themes import Themes
+import time
+
 class ResearchAreas:
+    def __init__(self):
+        with open('research_areas.json', 'r') as f:
+            self.AREAS = json.load(f)
+        
     @classmethod
     def get_all_areas(cls):
         areas = []
@@ -25,6 +36,7 @@ class ResearchAreas:
                 subgenreslist = AREAS[total_genre]
                 areas.extend(subgenreslist)
         return areas
+
 
 
 class CustomTableWidget(QTableWidget):
@@ -93,6 +105,10 @@ class CustomTableWidget(QTableWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.current_theme = "light"
+        self.font_size = 12
+
+
         self.setWindowTitle("Professor Email Manager")
         self.setGeometry(100, 100, 1200, 800)
         
@@ -121,6 +137,10 @@ class MainWindow(QMainWindow):
         cred_layout.addWidget(self.cv_path)
         cred_layout.addWidget(browse_btn)
         layout.addLayout(cred_layout)
+
+        self.AREAS = {}
+        with open('research_areas.json', 'r') as f:
+            self.AREAS = json.load(f)
         
         # Create primary table
         self.primary_table = CustomTableWidget(
@@ -137,10 +157,14 @@ class MainWindow(QMainWindow):
         add_row_btn.clicked.connect(self.primary_table.add_row)
         send_btn = QPushButton("Send Emails")
         send_btn.clicked.connect(self.send_emails)
+        delte_duplicate_btn = QPushButton("Delete Duplicates")
+        delte_duplicate_btn.clicked.connect(self.delete_duplicates)
         btn_layout.addWidget(add_row_btn)
         btn_layout.addWidget(send_btn)
+        btn_layout.addWidget(delte_duplicate_btn)
+
         layout.addLayout(btn_layout)
-        
+
         # Create follow-up table
         self.followup_table = CustomTableWidget(
             ["Family Name", "Email", "Working Area", "Last Email Date", 
@@ -152,11 +176,60 @@ class MainWindow(QMainWindow):
         # Link the follow-up table to the primary table
         self.primary_table.followup_table = self.followup_table
         
+        # create push buuton for  follow-up table
+        followup_btn_layout = QHBoxLayout()
+        add_followup_row_btn = QPushButton("Add follow-up Row")
+        add_followup_row_btn.clicked.connect(self.followup_table.add_row)
+        send_followup_btn = QPushButton("Send Follow-up Emails")
+        send_followup_btn.clicked.connect(self.send_followup_emails)
+        delte_duplicate_btn = QPushButton("Delete Duplicates")
+        delte_duplicate_btn.clicked.connect(self.delete_followup_duplicates)
+
+        followup_btn_layout.addWidget(add_followup_row_btn)
+        followup_btn_layout.addWidget(send_followup_btn)
+        followup_btn_layout.addWidget(delte_duplicate_btn)
+
+
+
+
+
+
+        layout.addLayout(followup_btn_layout)
+
+
+
+
+
+
         # Load saved data
         self.load_data()
         
         # Set up auto-save
         self.setup_autosave()
+
+        # Apply theme
+        self.apply_theme()
+
+        # Set the setting if I press the ctrl + + or ctrl + - it will change the font size
+        self.shortcut_plus = QShortcut(QKeySequence("Ctrl+w"), self)
+        self.shortcut_minus = QShortcut(QKeySequence("Ctrl+s"), self)
+
+        self.shortcut_plus.activated.connect(self.increase_font_size)
+        self.shortcut_minus.activated.connect(self.decrease_font_size)
+
+    def increase_font_size(self):
+        self.font_size += 0.5
+        self.apply_theme()
+
+    def decrease_font_size(self):
+        self.font_size -= 0.5
+        self.apply_theme()
+
+
+        
+
+
+
     
     def browse_cv(self):
         file_name, _ = QFileDialog.getOpenFileName(
@@ -165,6 +238,51 @@ class MainWindow(QMainWindow):
         if file_name:
             self.cv_path.setText(file_name)
             self.save_data()
+
+    def delete_duplicates(self):
+        # Create a set to track unique emails
+        emails = set()
+        
+        # Iterate through the primary table in reverse order to safely remove rows
+        for i in range(self.primary_table.rowCount() - 1, -1, -1):
+            try:
+                # Get the email from the current row
+                email = self.primary_table.item(i, 1).text()
+            except AttributeError:
+                # Skip rows without an email
+                continue
+            
+            # Check if email is a duplicate
+            if email in emails:
+                # Remove the duplicate row
+                self.primary_table.removeRow(i)
+            else:
+                # Add unique email to the set
+                emails.add(email)
+    
+    def delete_followup_duplicates(self):
+        # Create a set to track unique emails
+        emails = set()
+        
+        # Iterate through the primary table in reverse order to safely remove rows
+        for i in range(self.followup_table.rowCount() - 1, -1, -1):
+            try:
+                # Get the email from the current row
+                email = self.followup_table.item(i, 1).text()
+            except AttributeError:
+                # Skip rows without an email
+                continue
+            
+            # Check if email is a duplicate
+            if email in emails:
+                # Remove the duplicate row
+                self.followup_table.removeRow(i)
+            else:
+                # Add unique email to the set
+                emails.add(email)
+                
+            
+
 
     def send_email_with_template(self,smtp_server, smtp_port, gmail_user, gmail_password, to_email, subject, template_path, cv_path, professor_name, total_genre, subgenre):
         """Send an email with a template file."""
@@ -238,6 +356,7 @@ fadibi@csumb.edu'''
             # email server configuration and error handling
                 # Configuration
             for row in range(self.primary_table.rowCount()):
+                time.sleep(4)
                 SMTP_SERVER = 'smtp.gmail.com'
                 SMTP_PORT = 587
                 GMAIL_USER = self.email_input.text()  # Replace with your Gmail address
@@ -250,7 +369,7 @@ fadibi@csumb.edu'''
 
                 # find the total genre
                 total_genre = ""
-                for main_area, subareas in ResearchAreas.AREAS.items():
+                for main_area, subareas in self.AREAS.items():
                     if subgenre in subareas:
                         total_genre = main_area
                         break
@@ -263,6 +382,9 @@ fadibi@csumb.edu'''
 
                 try:
                     self.send_email_with_template(SMTP_SERVER, SMTP_PORT, GMAIL_USER, GMAIL_PASSWORD, TO_EMAIL, SUBJECT, TEMPLATE_PATH, CV_PATH, professor_name, total_genre, subgenre)
+                
+                    # set the last email date
+                    self.primary_table.setItem(row, 3, QTableWidgetItem(str(datetime.now().date())))
                 except Exception as e:
                     print(f"Failed to send email to {TO_EMAIL}: {e}")
                         
@@ -339,6 +461,65 @@ fadibi@csumb.edu'''
         QMessageBox.information(self, "Info", "Saving data before closing")
         self.save_data()  # Explicitly save data when closing
         event.accept()
+
+    def apply_theme(self):
+        style = Themes.get_dynamic_style(self.current_theme, self.font_size)
+        self.setStyleSheet(style)
+
+    def send_followup_emails(self):
+        # Implementation of email sending functionality
+        try:
+            # Basic email validation
+            if not self.email_input.text() or not self.password_input.text():
+                QMessageBox.warning(self, "Error", "Please enter email credentials")
+                return
+            
+            if not self.cv_path.text() or not os.path.exists(self.cv_path.text()):
+                QMessageBox.warning(self, "Error", "Please select a valid CV file")
+                return
+            
+            # Email sending logic would go here
+            # For security reasons, actual implementation would need proper
+            # email server configuration and error handling
+                # Configuration
+            for row in range(self.followup_table.rowCount()):
+                time.sleep(4)
+                SMTP_SERVER = 'smtp.gmail.com'
+                SMTP_PORT = 587
+                GMAIL_USER = self.email_input.text()  # Replace with your Gmail address
+                GMAIL_PASSWORD = self.password_input.text()    # Replace with your Gmail app password
+                TO_EMAIL = self.primary_table.item(row, 1).text()  # Replace with recipient's email address
+                TEMPLATE_PATH = 'email_template.txt'  # Path to your email template file
+                CV_PATH = self.cv_path.text()
+                professor_name = self.primary_table.item(row, 0).text()
+                subgenre = self.primary_table.cellWidget(row, 2).currentText()
+
+                # find the total genre
+                total_genre = ""
+                for main_area, subareas in ResearchAreas.AREAS.items():
+                    if subgenre in subareas:
+                        total_genre = main_area
+                        break
+                
+                if total_genre == "":
+                    print(f"Error: {subgenre} not found in ResearchAreas for {professor_name}")
+                    continue
+
+                SUBJECT = "Prospective Graduate Student for Fall 2025 (Follow-up)"
+
+                try:
+                    self.send_email_with_template(SMTP_SERVER, SMTP_PORT, GMAIL_USER, GMAIL_PASSWORD, TO_EMAIL, SUBJECT, TEMPLATE_PATH, CV_PATH, professor_name, total_genre, subgenre)
+
+                except Exception as e:
+                    print(f"Failed to send email to {TO_EMAIL}: {e}")
+                        
+            QMessageBox.information(self, "Success", "follow up emails Emails sent successfully")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to send emails: {str(e)}")
+    
+
+    
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
