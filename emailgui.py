@@ -375,8 +375,9 @@ fadibi@csumb.edu'''
                         break
                 
                 if total_genre == "":
-                    print(f"Error: {subgenre} not found in ResearchAreas for {professor_name}")
-                    continue
+                    # print(f"Error:{subgenre} not found in ResearchAreas for {professor_name}")
+                    # continue
+                    total_genre = "computer science"
 
                 SUBJECT = "Prospective Graduate Student for Fall 2025"
 
