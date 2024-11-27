@@ -75,7 +75,8 @@
         "Incident Response",
         "Secure Software Development",
         "Digital Forensics",
-        "Blockchain Security"
+        "Blockchain Security",
+        "Cyberlaw"
     ],
     "Computational Biology and Bioinformatics": [
         "Genomics Analysis",
@@ -95,7 +96,8 @@
         "Procedural Generation",
         "Scientific Visualization",
         "Animation Techniques",
-        "Geospatial Visualization"
+        "Geospatial Visualization",
+        "Visualization"
     ],
     "Robotics": [
         "Autonomous Systems",
