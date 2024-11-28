@@ -11,6 +11,8 @@ from PyQt5.QtWidgets import QShortcut
 from PyQt5.QtGui import QKeySequence
 
 
+
+
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -39,6 +41,17 @@ class ResearchAreas:
 
 
 
+class SubstringCompleter(QCompleter):
+    def __init__(self, items, parent=None):
+        super().__init__(items, parent)
+        self.setFilterMode(Qt.MatchFlag.MatchContains)
+        self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+
+class PreventScrollComboBox(QComboBox):
+    def wheelEvent(self, event):
+        # Prevent the default wheel event from changing the selection
+        event.ignore()
+
 class CustomTableWidget(QTableWidget):
     def __init__(self, headers, is_primary=False, parent=None):
         super().__init__(parent)
@@ -47,30 +60,33 @@ class CustomTableWidget(QTableWidget):
         self.setHorizontalHeaderLabels(headers)
         self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.followup_table = None  # Will be set later for primary table
-        
+       
     def add_row(self):
         row_position = self.rowCount()
         self.insertRow(row_position)
-        
-        # Add ComboBox for Working Area
-        area_combo = QComboBox()
-        area_combo.addItems(ResearchAreas.get_all_areas())
+       
+        # Add ComboBox for Working Area with wheel event prevention and substring completer
+        area_combo = PreventScrollComboBox()
+        all_areas = ResearchAreas.get_all_areas()
+        area_combo.addItems(all_areas)
         area_combo.setEditable(True)
-        completer = QCompleter(ResearchAreas.get_all_areas())
-        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        area_combo.setCompleter(completer)
-        self.setCellWidget(row_position, 2, area_combo)
         
+        # Use custom substring completer
+        completer = SubstringCompleter(all_areas)
+        area_combo.setCompleter(completer)
+        
+        self.setCellWidget(row_position, 2, area_combo)
+       
         # Add ComboBox for Response Status
         status_combo = QComboBox()
         status_combo.addItems(["", "Yes", "No"])
         self.setCellWidget(row_position, 4, status_combo)
-        
+       
         # Add Remove button
         remove_btn = QPushButton("Remove")
         remove_btn.clicked.connect(lambda: self.removeRow(self.indexAt(remove_btn.pos()).row()))
         self.setCellWidget(row_position, 5, remove_btn)
-        
+       
         # Add Move to Follow-up button only for primary table
         if self.is_primary:
             followup_btn = QPushButton("Move to Follow-up")
@@ -80,11 +96,11 @@ class CustomTableWidget(QTableWidget):
     def move_to_followup(self, row):
         if not self.followup_table:
             return
-        
+       
         # Add new row to follow-up table
         self.followup_table.add_row()
         target_row = self.followup_table.rowCount() - 1
-        
+       
         # Copy data from primary to follow-up
         for col in range(5):  # Only copy until the "Remove" button column
             if isinstance(self.cellWidget(row, col), QComboBox):
@@ -96,9 +112,9 @@ class CustomTableWidget(QTableWidget):
                 # Copy regular cell content
                 item = self.item(row, col)
                 if item:
-                    self.followup_table.setItem(target_row, col, 
+                    self.followup_table.setItem(target_row, col,
                                               QTableWidgetItem(item.text()))
-        
+       
         # Remove row from primary table
         self.removeRow(row)
 
@@ -159,9 +175,12 @@ class MainWindow(QMainWindow):
         send_btn.clicked.connect(self.send_emails)
         delte_duplicate_btn = QPushButton("Delete Duplicates")
         delte_duplicate_btn.clicked.connect(self.delete_duplicates)
+        moveall_btn = QPushButton("Move All to Follow-up")
+        moveall_btn.clicked.connect(self.move_all_to_followup)
         btn_layout.addWidget(add_row_btn)
         btn_layout.addWidget(send_btn)
         btn_layout.addWidget(delte_duplicate_btn)
+        btn_layout.addWidget(moveall_btn)
 
         layout.addLayout(btn_layout)
 
@@ -226,7 +245,26 @@ class MainWindow(QMainWindow):
         self.apply_theme()
 
 
-        
+    def move_all_to_followup(self):
+        # Move all rows from primary table to follow-up table if they the last email date is not empty
+        for row in range(self.primary_table.rowCount() - 1, -1, -1):
+            try:
+                # Get the last email date from the current row
+                last_email_date = self.primary_table.item(row, 3).text()
+            except AttributeError:
+                # Skip rows without an email
+                continue
+            
+            # Check if the last email date is not empty
+            if last_email_date is not None or last_email_date != "":
+                # push the move to follow-up button
+                move_btn = self.primary_table.cellWidget(row, 6)
+                move_btn.click()
+            else:
+                print(f"Error: {last_email_date} is empty for {self.primary_table.item(row, 0).text()}")
+            
+                
+                
 
 
 
@@ -242,6 +280,18 @@ class MainWindow(QMainWindow):
     def delete_duplicates(self):
         # Create a set to track unique emails
         emails = set()
+
+        # first iterate through the followup table
+        for i in range(self.followup_table.rowCount() - 1, -1, -1):
+            try:
+                # Get the email from the current row
+                email = self.followup_table.item(i, 1).text()
+            except AttributeError:
+                # Skip rows without an email
+                continue
+            
+            # add the email to the set
+            emails.add(email)
         
         # Iterate through the primary table in reverse order to safely remove rows
         for i in range(self.primary_table.rowCount() - 1, -1, -1):
@@ -259,6 +309,8 @@ class MainWindow(QMainWindow):
             else:
                 # Add unique email to the set
                 emails.add(email)
+    
+
     
     def delete_followup_duplicates(self):
         # Create a set to track unique emails
@@ -489,11 +541,11 @@ fadibi@csumb.edu'''
                 SMTP_PORT = 587
                 GMAIL_USER = self.email_input.text()  # Replace with your Gmail address
                 GMAIL_PASSWORD = self.password_input.text()    # Replace with your Gmail app password
-                TO_EMAIL = self.primary_table.item(row, 1).text()  # Replace with recipient's email address
+                TO_EMAIL = self.followup_table.item(row, 1).text()  # Replace with recipient's email address
                 TEMPLATE_PATH = 'email_template.txt'  # Path to your email template file
                 CV_PATH = self.cv_path.text()
-                professor_name = self.primary_table.item(row, 0).text()
-                subgenre = self.primary_table.cellWidget(row, 2).currentText()
+                professor_name = self.followup_table.item(row, 0).text()
+                subgenre = self.followup_table.cellWidget(row, 2).currentText()
 
                 # find the total genre
                 total_genre = ""
@@ -514,7 +566,7 @@ fadibi@csumb.edu'''
                 except Exception as e:
                     print(f"Failed to send email to {TO_EMAIL}: {e}")
                         
-            QMessageBox.information(self, "Success", "follow up emails Emails sent successfully")
+            QMessageBox.information(self, "Success", "follow up emails sent successfully")
             
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to send emails: {str(e)}")

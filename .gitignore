@@ -1,4 +1,4 @@
 tmp/
 myenv/
 *.pyc
-app_data.json
+app_data*
